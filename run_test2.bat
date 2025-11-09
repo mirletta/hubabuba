@@ -1,3 +1,3 @@
 @echo off
-REM Тест с VFS путем
+REM Тест с VFS путем 
 python hello.py --vfs /mnt/virtual
