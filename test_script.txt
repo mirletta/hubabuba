@@ -4,4 +4,4 @@ ls -la /home
 cd /tmp
 cd "my folder"
 unknown_command
-exit
+exit 
