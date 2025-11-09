@@ -67,7 +67,6 @@ def main():
     print(f"Стартовый скрипт: {script_path if script_path else 'не задан'}")
     print("===========================")
     
-    # Если есть стартовый скрипт, выполнить его
     if script_path:
         run_script(script_path)
     
