@@ -1,8 +1,3 @@
-# UNIX Shell Emulator
-
-Эмулятор командной оболочки UNIX.
-
-## Запуск
 
 ```bash
 python hello.py [--vfs <путь>] [--script <путь_к_скрипту>]
