@@ -10,8 +10,8 @@ import lark
 
 grammar = r"""
 %ignore /\s+/
-%ignore /\*[^\n]*/      // однострочные комментарии
-%ignore /\{-[^-]*-\}/   // многострочные комментарии
+%ignore /\*[^\n]*/      
+%ignore /\{-[^-]*-\}/  
 
 NUM: /0[bB][01]+/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
@@ -145,4 +145,4 @@ def transform(input: str) -> str:
     output = tomli_w.dumps(a)
     return output
 
-print(transform(INPUT))LP
+print(transform(INPUT))
