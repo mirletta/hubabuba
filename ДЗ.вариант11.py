@@ -10,8 +10,8 @@ import lark
 
 grammar = r"""
 %ignore /\s+/
-%ignore /\*[^\n]*/      
-%ignore /\{-[^-]*-\}/  
+%ignore /\*[^\n]*/      // однострочные комментарии
+%ignore /\{-[^-]*-\}/   // многострочные комментарии
 
 NUM: /0[bB][01]+/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
@@ -20,25 +20,24 @@ start: (const | table)*
 
 const: NAME ":=" value ";"
 
-table: "table(" [pair ("," pair)*] ")"
+table: "table" "(" [pair ("," pair)*] ")"
 pair: NAME "=>" value
 
-array: "({" [value ("," value)*] "})"
+array: "(" "{" [value ("," value)*] "}" ")"
 
-prefixed: "#[" prefix "]"
+prefixed: "#" "[" prefix "]"
 prefix: add | sub | mul | power
 
 add: "+" value value
 sub: "-" value value
 mul: "*" value value
-power: "pow(" value value ")" 
+power: "pow" "(" value value ")"
 
 ?value: table
       | array
       | prefixed
-      | const
+      | NAME
       | NUM
-      | NAME         
 """
 
 class T(lark.Transformer):
@@ -61,22 +60,34 @@ class T(lark.Transformer):
         return None
     
     def table(self, items):
-        return dict(items[0]) if items else {}
+        if not items:
+            return {}
+        
+        result = {}
+        for key, value in items:
+            if isinstance(value, lark.Tree) and value.data == 'prefix':
+                value = value.children[0]
+            
+            if isinstance(value, str) and value in self.constants:
+                result[key] = self.constants[value]
+            else:
+                result[key] = value
+        return result
     
     def pair(self, items):
         key, val = items
-        if isinstance(val, str) and val in self.constants:
-            val = self.constants[val]
         return (key, val)
     
     def array(self, items):
-        vals = items[0] if items else []
+        if items is None:
+            return []
+        
         result = []
-        for v in vals:
-            if isinstance(v, str) and v in self.constants:
-                result.append(self.constants[v])
+        for item in items:
+            if isinstance(item, str) and item in self.constants:
+                result.append(self.constants[item])
             else:
-                result.append(v)
+                result.append(item)
         return result
     
     def add(self, items):
@@ -137,10 +148,20 @@ def = [42, 1]
 key = 123
 '''
 
-# Parsers (Combinators, ANTLR, Lark, ...)
 def transform(input: str) -> str:
-    parser = lark.Lark(grammar)
+    parser = lark.Lark(grammar, parser='lalr')
     treee = parser.parse(input)
+    
+  
+    print("Дерево парсинга:")
+    for subtree in treee.iter_subtrees():
+        indent = "▶ " * (subtree.meta.line - 1 if hasattr(subtree.meta, 'line') else 0)
+        print(f"{indent}{subtree.data}")
+        for child in subtree.children:
+            if isinstance(child, lark.Tree):
+                continue
+            print(f"{indent}{child}")
+    
     a = T().transform(treee)
     output = tomli_w.dumps(a)
     return output
