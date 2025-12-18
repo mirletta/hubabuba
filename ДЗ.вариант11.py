@@ -31,7 +31,7 @@ prefix: add | sub | mul | power
 add: "+" value value
 sub: "-" value value
 mul: "*" value value
-power: "pow(" value value ")"  // БЕЗ ЗАПЯТОЙ
+power: "pow(" value value ")" 
 
 ?value: table
       | array
