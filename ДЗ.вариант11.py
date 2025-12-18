@@ -23,7 +23,7 @@ const: NAME ":=" value ";"
 table: "table(" [pair ("," pair)*] ")"
 pair: NAME "=>" value
 
-array: "({" [value ("," value)*] "})"  // ({ ... })
+array: "({" [value ("," value)*] "})"
 
 prefixed: "#[" prefix "]"
 prefix: add | sub | mul | power
@@ -38,7 +38,7 @@ power: "pow(" value value ")"
       | prefixed
       | const
       | NUM
-      | NAME          
+      | NAME         
 """
 
 class T(lark.Transformer):
